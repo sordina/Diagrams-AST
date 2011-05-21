@@ -51,7 +51,7 @@ Library
   -- Exposed-modules:     
   
   -- Packages needed in order to build this package.
-  -- Build-depends:       
+  Build-depends: gloss
   
   -- Modules not exported by this package.
   -- Other-modules:       
