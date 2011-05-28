@@ -1,6 +1,7 @@
 {-# LANGUAGE NoMonomorphismRestriction, FlexibleContexts #-}
 
 module Graphics.Rendering.Diagrams.AST (
+  outputImage,
   runImage,
   Image(..),
   Modifier(..),
@@ -11,24 +12,31 @@ module Graphics.Rendering.Diagrams.AST (
 where
 
 import Diagrams.Prelude hiding (LineColor, LineWidth, Dashing)
+import Diagrams.Backend.Cairo
+import Data.List (foldl')
 
 --- Data Types
 
 data Image = Shape Shape
            | Modifier Modifier Image
-           | Combiner Combiner
+           | Combiner Combiner deriving (Show, Eq, Ord)
 
 data Modifier = Foreground       ColorData
               | LineColor        ColorData
               | LineWidth        Double
               | Dashing [Double] Double
               | Translate Double Double
-              | Freeze deriving (Show, Eq, Ord)
+              | Scale Double Double
+              | Pad Double
+              | Freeze
+              | Changes [Modifier] deriving (Show, Eq, Ord)
 
-data Combiner = NextTo Image Image
+data Combiner = Atop   Image Image
+              | NextTo Image Image
               | Above  Image Image
+              | Layers     [Image]
               | Horizontal [Image]
-              | Vertical   [Image]
+              | Vertical   [Image] deriving (Show, Eq, Ord)
 
 data Shape = Circle deriving (Show, Eq, Ord)
 
@@ -41,6 +49,8 @@ instance Color ColorData where
 
 ---- Run ADT Functions
 
+outputImage name width height image = renderDia Cairo (CairoOptions name (PNG (width, height))) (runImage image)
+
 --- Main runner
 
 runImage (Shape s)      = runShape s
@@ -49,8 +59,10 @@ runImage (Combiner c)   = runCombiner c
 
 --- Internal runners
 
+runCombiner (Atop   l r)   = runImage l `atop` runImage r
 runCombiner (NextTo l r)   = runImage l ||| runImage r
 runCombiner (Above  t b)   = runImage t === runImage b
+runCombiner (Layers     l) = mconcat . map runImage $ l
 runCombiner (Horizontal l) = hcat (map runImage l)
 runCombiner (Vertical   l) = vcat (map runImage l)
 
@@ -61,12 +73,7 @@ runModifier (LineColor  c)  = lineColor c
 runModifier (LineWidth  w)  = lw w
 runModifier (Dashing  a w)  = dashing a w
 runModifier (Translate x y) = translate (x, y)
+runModifier (Scale x y)     = scaleX x . scaleY y
+runModifier (Pad r)         = pad r
+runModifier (Changes l)     = foldl' (.) id . map runModifier $ l
 runModifier  Freeze         = freeze
-
--- Testing Colors
-
-blue' :: ColorData
-blue' = ColorData 0 0 1 1
-
-purple' :: ColorData
-purple' = ColorData 1 0 1 1
