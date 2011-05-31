@@ -8,7 +8,7 @@ module Graphics.Rendering.Diagrams.AST (
   -- Data Types
   Image     (..),
   Modifier  (..),
-  Combiner  (..),
+  Images    (..),
   Path      (..),
   Shape     (..),
   ColorData (..),
@@ -35,7 +35,7 @@ import Data.List (foldl')
 
 data Image = Shape Shape
            | Modifier Modifier Image
-           | Combiner Combiner deriving (Show, Eq, Ord)
+           | Images Images deriving (Show, Eq, Ord)
 
 data Modifier = Foreground       ColorData
               | LineColor        ColorData
@@ -47,7 +47,7 @@ data Modifier = Foreground       ColorData
               | Freeze
               | Changes [Modifier] deriving (Show, Eq, Ord)
 
-data Combiner = Atop   Image Image
+data Images = Atop   Image Image
               | NextTo Image Image
               | Above  Image Image
               | Layers     [Image]
@@ -56,7 +56,7 @@ data Combiner = Atop   Image Image
 
 data Path = Offsets [Offset]
           | Points  [Point]
-          | Arc      Angle  deriving (Show, Eq, Ord)
+          | Arc Angle Angle deriving (Show, Eq, Ord)
 
 data Shape = Circle
            | Path Fill NodeStyle Path deriving (Show, Eq, Ord)
@@ -86,7 +86,7 @@ outputImage name width height image = D.renderDia Cairo (CairoOptions name (PNG 
 
 runImage (Shape s)      = runShape s
 runImage (Modifier m i) = runModifier m (runImage i)
-runImage (Combiner c)   = runCombiner c
+runImage (Images c)   = runCombiner c
 
 --- Internal runners
 
