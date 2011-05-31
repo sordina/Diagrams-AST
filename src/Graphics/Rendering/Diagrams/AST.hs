@@ -11,7 +11,7 @@ module Graphics.Rendering.Diagrams.AST (
   )
 where
 
-import Diagrams.Prelude hiding (LineColor, LineWidth, Dashing)
+import Diagrams.Prelude hiding (LineColor, LineWidth, Dashing, Point, Path)
 import Diagrams.Backend.Cairo
 import Data.List (foldl')
 
@@ -38,9 +38,19 @@ data Combiner = Atop   Image Image
               | Horizontal [Image]
               | Vertical   [Image] deriving (Show, Eq, Ord)
 
-data Shape = Circle deriving (Show, Eq, Ord)
+data Path = Offsets [Offset]
+          | Points  [Point] deriving (Show, Eq, Ord)
+
+newtype Offset = Offset Double deriving (Show, Eq, Ord)
+newtype Point  = Point  Double deriving (Show, Eq, Ord)
+
+data Shape = Circle
+           | Path Fill Path deriving (Show, Eq, Ord)
 
 data ColorData = ColorData Double Double Double Double deriving (Show, Eq, Ord)
+
+data Fill = Join
+          | Open deriving (Show, Eq, Ord)
 
 --- Instances
 
