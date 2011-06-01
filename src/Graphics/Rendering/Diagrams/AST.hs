@@ -23,9 +23,14 @@ module Graphics.Rendering.Diagrams.AST (
 where
 
 -- Diagram Imports
-import qualified Diagrams.Prelude as D
+import qualified Diagrams.Prelude                   as D
+import qualified Diagrams.Path                      as P
+import qualified Diagrams.TwoD.Path                 as P2
+import qualified Diagrams.TwoD.Arc                  as A
+import qualified Diagrams.Backend.Cairo             as C
+import qualified Graphics.Rendering.Diagrams.Points as P3
+
 import           Diagrams.Prelude ((|||), (===))
-import           Diagrams.Backend.Cairo
 
 -- Data Imports
 import Data.Monoid
@@ -48,18 +53,18 @@ data Modifier = Foreground       ColorData
               | Changes [Modifier] deriving (Show, Eq, Ord)
 
 data Images = Atop   Image Image
-              | NextTo Image Image
-              | Above  Image Image
-              | Layers     [Image]
-              | Horizontal [Image]
-              | Vertical   [Image] deriving (Show, Eq, Ord)
+            | NextTo Image Image
+            | Above  Image Image
+            | Layers     [Image]
+            | Horizontal [Image]
+            | Vertical   [Image] deriving (Show, Eq, Ord)
+
+data Shape = Circle
+           | Path Fill NodeStyle Path deriving (Show, Eq, Ord)
 
 data Path = Offsets [Offset]
           | Points  [Point]
           | Arc Angle Angle deriving (Show, Eq, Ord)
-
-data Shape = Circle
-           | Path Fill NodeStyle Path deriving (Show, Eq, Ord)
 
 data ColorData = ColorData Double Double Double Double deriving (Show, Eq, Ord)
 
@@ -69,9 +74,9 @@ data Fill = Joined
 data NodeStyle = Smooth
                | Sharp deriving (Show, Eq, Ord)
 
-newtype Offset = Offset Double deriving (Show, Eq, Ord)
-newtype Point  = Point  Double deriving (Show, Eq, Ord)
-newtype Angle  = Angle  Double deriving (Show, Eq, Ord)
+newtype Offset = Offset { getOffset :: (Double, Double) } deriving (Show, Eq, Ord)
+newtype Point  = Point  { getPoint  :: (Double, Double) } deriving (Show, Eq, Ord)
+newtype Angle  = Angle  { getAngle  ::  Double }          deriving (Show, Eq, Ord)
 
 --- Instances
 
@@ -80,7 +85,8 @@ instance D.Color ColorData where
 
 ---- Run ADT Functions
 
-outputImage name width height image = D.renderDia Cairo (CairoOptions name (PNG (width, height))) (runImage image)
+outputImage name width height image =
+  D.renderDia C.Cairo (C.CairoOptions name (C.PNG (width, height))) (runImage image)
 
 --- Main runner
 
@@ -97,7 +103,9 @@ runCombiner (Layers     l) = mconcat . map runImage $ l
 runCombiner (Horizontal l) = D.hcat (map runImage l)
 runCombiner (Vertical   l) = D.vcat (map runImage l)
 
-runShape Circle = D.circle
+runShape  Circle      = D.circle
+runShape (Path Joined n p) = P2.stroke $ P.close $ runPath p
+runShape (Path Open   n p) = P2.stroke $ P.open  $ runPath p -- TODO: something with n
 
 runModifier (Foreground c)  = D.fillColor c
 runModifier (LineColor  c)  = D.lineColor c
@@ -108,3 +116,7 @@ runModifier (Scale x y)     = D.scaleX x . D.scaleY y
 runModifier (Pad r)         = D.pad r
 runModifier (Changes l)     = foldl' (.) id . map runModifier $ l
 runModifier  Freeze         = D.freeze
+
+runPath (Offsets l) = P.fromOffsets  . map  getOffset        $ l
+runPath (Points  l) = P.fromVertices . map (P3.P . getPoint) $ l
+runPath (Arc b   e) = A.arc (getAngle b) (getAngle e)
