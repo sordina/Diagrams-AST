@@ -16,8 +16,6 @@ module Graphics.Rendering.Diagrams.AST (
   NodeStyle (..),
 
   -- Newtypes
-  Offset (..),
-  Point  (..),
   Angle  (..)
   )
 where
@@ -62,21 +60,19 @@ data Images = Atop   Image Image
 data Shape = Circle
            | Path Fill NodeStyle Path deriving (Show, Eq, Ord)
 
-data Path = Offsets [Offset]
-          | Points  [Point]
+data Path = Offsets [(Double,Double)]
+          | Points  [(Double,Double)]
           | Arc Angle Angle deriving (Show, Eq, Ord)
 
 data ColorData = ColorData Double Double Double Double deriving (Show, Eq, Ord)
 
-data Fill = Joined
+data Fill = Closed
           | Open deriving (Show, Eq, Ord)
 
 data NodeStyle = Smooth
                | Sharp deriving (Show, Eq, Ord)
 
-newtype Offset = Offset { getOffset :: (Double, Double) } deriving (Show, Eq, Ord)
-newtype Point  = Point  { getPoint  :: (Double, Double) } deriving (Show, Eq, Ord)
-newtype Angle  = Angle  { getAngle  ::  Double }          deriving (Show, Eq, Ord)
+newtype Angle  = Radians { getAngle  ::  Double }          deriving (Show, Eq, Ord)
 
 --- Instances
 
@@ -104,7 +100,7 @@ runCombiner (Horizontal l) = D.hcat (map runImage l)
 runCombiner (Vertical   l) = D.vcat (map runImage l)
 
 runShape  Circle      = D.circle
-runShape (Path Joined n p) = P2.stroke $ P.close $ runPath p
+runShape (Path Closed n p) = P2.stroke $ P.close $ runPath p
 runShape (Path Open   n p) = P2.stroke $ P.open  $ runPath p -- TODO: something with n
 
 runModifier (Foreground c)  = D.fillColor c
@@ -117,6 +113,6 @@ runModifier (Pad r)         = D.pad r
 runModifier (Changes l)     = foldl' (.) id . map runModifier $ l
 runModifier  Freeze         = D.freeze
 
-runPath (Offsets l) = P.fromOffsets  . map  getOffset        $ l
-runPath (Points  l) = P.fromVertices . map (P3.P . getPoint) $ l
+runPath (Offsets l) = P.fromOffsets l
+runPath (Points  l) = (P.fromVertices . map P3.P) l
 runPath (Arc b   e) = A.arc (getAngle b) (getAngle e)
