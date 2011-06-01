@@ -64,7 +64,8 @@ data Path = Offsets [(Double,Double)]
           | Points  [(Double,Double)]
           | Arc Angle Angle deriving (Show, Eq, Ord)
 
-data ColorData = ColorData Double Double Double Double deriving (Show, Eq, Ord)
+data ColorData = RGBA Double Double Double Double
+               | RAA  Double Double Double Double deriving (Show, Eq, Ord)
 
 data Fill = Closed
           | Open deriving (Show, Eq, Ord)
@@ -77,7 +78,10 @@ newtype Angle  = Radians { getAngle  ::  Double }          deriving (Show, Eq, O
 --- Instances
 
 instance D.Color ColorData where
-  colorToRGBA (ColorData r g b a) = (r, g, b, a)
+  colorToRGBA (RGBA r g b a) = (r, g, b, a)
+  colorToRGBA (RAA  r g e a) = ( r * cos g * cos e,
+                                 r * cos g * sin e,
+                                 r * sin g, a )
 
 ---- Run ADT Functions
 
