@@ -21,7 +21,7 @@ paths = do
 
 shape c l = Modifier (Changes [Foreground c, LineWidth 0.05]) $
             Shape $
-            Path Closed Sharp $
+            Path Closed $
             Offsets l
 
 chunk n [] = []

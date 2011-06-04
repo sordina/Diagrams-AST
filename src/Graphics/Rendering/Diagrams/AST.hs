@@ -48,6 +48,7 @@ data Modifier = Foreground       ColorData
               | Dashing [Double] Double
               | Translate Double Double
               | Scale Double Double
+              | Rotate Angle
               | Pad Double
               | Freeze
               | Origin
@@ -74,7 +75,13 @@ data Fill = Closed | Open deriving (Show, Eq, Ord)
 
 data Alignment = L | R | T | B | TL | TR | BL | BR | C | CX | CY | X Double | Y Double deriving (Show, Eq, Ord)
 
-newtype Angle  = Radians { getAngle  ::  Double } deriving (Show, Eq, Ord)
+data Angle = Fraction Double | Radians Double | Degrees Double deriving (Show, Eq, Ord)
+
+getAngleFraction (Fraction x) = x
+getAngleFraction (Radians  x) = x / (2*pi)
+getAngleFraction (Degrees  x) = x / 360
+getAngleRadians = (* 2) . (* pi) . getAngleFraction
+getAngleDegrees = (* 360)        . getAngleFraction
 
 --- Instances
 
@@ -123,7 +130,7 @@ runModifier  Freeze         = D.freeze
 
 runPath (Offsets l) = P.fromOffsets l
 runPath (Points  l) = (P.fromVertices . map P3.P) l
-runPath (Arc b   e) = A.arc (getAngle b) (getAngle e)
+runPath (Arc b   e) = A.arc (getAngleRadians b) (getAngleRadians e)
 
 runAlign L     = L.alignL
 runAlign R     = L.alignR
