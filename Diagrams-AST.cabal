@@ -32,7 +32,7 @@ Author:              Lyndon Maydwell
 Maintainer:          lyndon@sordina.net
 
 -- A copyright notice.
--- Copyright:           
+-- Copyright: Attribution Plz
 
 Category:            Graphics
 
@@ -48,10 +48,10 @@ Cabal-version:       >=1.2
 
 Library
   -- Modules exported by the library.
-  -- Exposed-modules:     
+  -- Exposed-modules: Graphics.Rendering.Diagrams.AST
   
   -- Packages needed in order to build this package.
-  Build-depends: gloss
+  Build-depends: diagrams-lib, diagrams-core, diagrams-cairo, gloss
   
   -- Modules not exported by this package.
   -- Other-modules:       

@@ -1,6 +1,5 @@
 import Graphics.Rendering.Diagrams.AST
 import System.Random
-import Data.List
 import Control.Applicative
 
 main = do
