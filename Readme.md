@@ -31,3 +31,4 @@ This can be useful as it allows inspection and modification of diagrams.
 
 * Move rendering code to a separate package
 * Move Gloss dependency to separate package
+* Complete function definitions
