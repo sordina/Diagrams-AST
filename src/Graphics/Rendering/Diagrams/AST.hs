@@ -4,6 +4,9 @@ module Graphics.Rendering.Diagrams.AST (
   -- Functions
   outputImage,
   runImage,
+  getAngleFraction,
+  getAngleRadians,
+  getAngleDegrees,
 
   -- Data Types
   Image     (..),
@@ -121,6 +124,7 @@ runModifier (LineColor  c)  = D.lineColor c
 runModifier (LineWidth  w)  = D.lw w
 runModifier (Dashing  a w)  = D.dashing a w
 runModifier (Translate x y) = D.translate (x, y)
+runModifier (Rotate a)      = D.rotateBy (getAngleFraction a)
 runModifier (Scale x y)     = D.scaleX x . D.scaleY y
 runModifier (Pad r)         = D.pad r
 runModifier (Align a)       = runAlign a

@@ -3,7 +3,7 @@ import Graphics.Rendering.Diagrams.AST
 main = outputImage "../test.png" 300 300 circles
 
 circles :: Image
-circles = Images . Vertical . zipWith Modifier scaling . replicate 10 $ circle
+circles = Modifier (Rotate $ Fraction 0.1) . Images . Vertical . zipWith Modifier scaling . replicate 10 $ circle
 
 scaling :: [Modifier]
 scaling = zipWith Scale xs xs where xs = iterate (* 0.8) 1
