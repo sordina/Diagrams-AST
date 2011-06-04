@@ -28,4 +28,5 @@ Diagrams AST provides a data oriented interface to the Graphics.Rendering.Diagra
 
 ## To-do:
 
-Separate out rendering from the AST code (possibly a separate package).
+* Move rendering code to a separate package
+* Move Gloss dependency to separate package
