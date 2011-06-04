@@ -6,7 +6,7 @@ circles :: Image
 circles = Images . Vertical . zipWith Modifier scaling . replicate 10 $ circle
 
 scaling :: [Modifier]
-scaling = map (uncurry Scale) (zip xs xs) where xs = iterate (* 0.8) 1
+scaling = zipWith Scale xs xs where xs = iterate (* 0.8) 1
 
 circle :: Image
 circle  = Modifier (Foreground green) $ Shape Circle
