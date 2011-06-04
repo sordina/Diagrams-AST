@@ -1,11 +1,15 @@
 import Graphics.Rendering.Diagrams.AST
 
-main = outputImage "../test.png" 300 300 (Modifier (Pad 3) boob)
+main = outputImage "../test.png" 300 300 circles
 
-boobs  = Combiner (Horizontal [boob, boob])
-boob   = Modifier (Pad 1) $ Combiner (Atop nipple breast)
-breast = Modifier (Foreground pink) circle
-nipple = Modifier (Changes [Scale 0.1 0.1, Foreground brown]) circle
-pink   = ColorData 1   0.8  0.8 1
-brown  = ColorData 0.9 0.5  0.1 1
-circle = Shape Circle
+circles :: Image
+circles = Images . Vertical . zipWith Modifier scaling . replicate 10 $ circle
+
+scaling :: [Modifier]
+scaling = map (uncurry Scale) (zip xs xs) where xs = iterate (* 0.8) 1
+
+circle :: Image
+circle  = Modifier (Foreground green) $ Shape Circle
+
+green :: ColorData
+green = RGBA 0.1 0.9 0.1 1
