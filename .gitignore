@@ -2,3 +2,4 @@
 *.hi
 *.o
 angles
+!documentation/chart.png
