@@ -3,7 +3,8 @@ Diagrams AST (Abstract Syntax Tree)
 
 <img src="/sordina/Diagrams-AST/raw/master/documentation/chart.png" alt="Bar-Chart Example" />
 
-Diagrams AST provides a data oriented interface to the Graphics.Rendering.Diagrams package.
+Diagrams AST provides a data oriented interface to the
+<a href="http://hackage.haskell.org/package/diagrams-core">Graphics.Rendering.Diagrams</a> package.
 
 This can be useful as it allows inspection and modification of diagrams.
 
