@@ -13,7 +13,7 @@ module Graphics.Rendering.Diagrams.AST (
   Shape     (..),
   ColorData (..),
   Fill      (..),
-  NodeStyle (..),
+  Alignment (..),
 
   -- Newtypes
   Angle  (..)
@@ -25,6 +25,7 @@ import qualified Diagrams.Prelude                   as D
 import qualified Diagrams.Path                      as P
 import qualified Diagrams.TwoD.Path                 as P2
 import qualified Diagrams.TwoD.Arc                  as A
+import qualified Diagrams.TwoD.Align                as L
 import qualified Diagrams.Backend.Cairo             as C
 import qualified Graphics.Rendering.Diagrams.Points as P3
 
@@ -36,7 +37,8 @@ import Data.List (foldl')
 
 --- Data Types
 
-data Image = Shape Shape
+data Image = Blank
+           | Shape Shape
            | Modifier Modifier Image
            | Images Images deriving (Show, Eq, Ord)
 
@@ -48,6 +50,8 @@ data Modifier = Foreground       ColorData
               | Scale Double Double
               | Pad Double
               | Freeze
+              | Origin
+              | Align Alignment
               | Changes [Modifier] deriving (Show, Eq, Ord)
 
 data Images = Atop   Image Image
@@ -57,8 +61,7 @@ data Images = Atop   Image Image
             | Horizontal [Image]
             | Vertical   [Image] deriving (Show, Eq, Ord)
 
-data Shape = Circle
-           | Path Fill NodeStyle Path deriving (Show, Eq, Ord)
+data Shape = Circle | Square | Path Fill Path deriving (Show, Eq, Ord)
 
 data Path = Offsets [(Double,Double)]
           | Points  [(Double,Double)]
@@ -67,13 +70,11 @@ data Path = Offsets [(Double,Double)]
 data ColorData = RGBA Double Double Double Double
                | RAA  Double Double Double Double deriving (Show, Eq, Ord)
 
-data Fill = Closed
-          | Open deriving (Show, Eq, Ord)
+data Fill = Closed | Open deriving (Show, Eq, Ord)
 
-data NodeStyle = Smooth
-               | Sharp deriving (Show, Eq, Ord)
+data Alignment = L | R | T | B | TL | TR | BL | BR | C | CX | CY | X Double | Y Double deriving (Show, Eq, Ord)
 
-newtype Angle  = Radians { getAngle  ::  Double }          deriving (Show, Eq, Ord)
+newtype Angle  = Radians { getAngle  ::  Double } deriving (Show, Eq, Ord)
 
 --- Instances
 
@@ -92,7 +93,7 @@ outputImage name width height image =
 
 runImage (Shape s)      = runShape s
 runImage (Modifier m i) = runModifier m (runImage i)
-runImage (Images c)   = runCombiner c
+runImage (Images c)     = runCombiner c
 
 --- Internal runners
 
@@ -103,9 +104,10 @@ runCombiner (Layers     l) = mconcat . map runImage $ l
 runCombiner (Horizontal l) = D.hcat (map runImage l)
 runCombiner (Vertical   l) = D.vcat (map runImage l)
 
-runShape  Circle      = D.circle
-runShape (Path Closed n p) = P2.stroke $ P.close $ runPath p
-runShape (Path Open   n p) = P2.stroke $ P.open  $ runPath p -- TODO: something with n
+runShape  Circle         = D.circle
+runShape  Square         = D.square
+runShape (Path Closed p) = P2.stroke $ P.close $ runPath p
+runShape (Path Open   p) = P2.stroke $ P.open  $ runPath p
 
 runModifier (Foreground c)  = D.fillColor c
 runModifier (LineColor  c)  = D.lineColor c
@@ -114,9 +116,25 @@ runModifier (Dashing  a w)  = D.dashing a w
 runModifier (Translate x y) = D.translate (x, y)
 runModifier (Scale x y)     = D.scaleX x . D.scaleY y
 runModifier (Pad r)         = D.pad r
-runModifier (Changes l)     = foldl' (.) id . map runModifier $ l
+runModifier (Align a)       = runAlign a
+runModifier (Changes l)     = foldl' (flip (.)) id . map runModifier $ l
+runModifier  Origin         = D.showOrigin
 runModifier  Freeze         = D.freeze
 
 runPath (Offsets l) = P.fromOffsets l
 runPath (Points  l) = (P.fromVertices . map P3.P) l
 runPath (Arc b   e) = A.arc (getAngle b) (getAngle e)
+
+runAlign L     = L.alignL
+runAlign R     = L.alignR
+runAlign T     = L.alignT
+runAlign B     = L.alignB
+runAlign TL    = L.alignTL
+runAlign TR    = L.alignTR
+runAlign BL    = L.alignBL
+runAlign BR    = L.alignBR
+runAlign C     = L.centerXY
+runAlign CX    = L.centerX
+runAlign CY    = L.centerY
+runAlign (X x) = L.alignX $ toRational x
+runAlign (Y y) = L.alignY $ toRational y
