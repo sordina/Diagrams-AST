@@ -5,6 +5,7 @@ Diagrams AST (Abstract Syntax Tree)
 
 Diagrams AST provides a data oriented interface to the Graphics.Rendering.Diagrams package.
 
+This can be useful as it allows inspection and modification of diagrams.
 
 ## Example:
 
