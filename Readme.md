@@ -1,7 +1,7 @@
 Diagrams AST (Abstract Syntax Tree)
 ===================================
 
-<img src="foooo.png" alt="Bar-Chart Example" />
+<img src="/sordina/Diagrams-AST/raw/master/documentation/chart.png" alt="Bar-Chart Example" />
 
 Diagrams AST provides a data oriented interface to the Graphics.Rendering.Diagrams package.
 
