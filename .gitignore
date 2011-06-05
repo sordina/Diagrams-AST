@@ -2,4 +2,5 @@
 *.hi
 *.o
 angles
+gloss
 !documentation/chart.png
