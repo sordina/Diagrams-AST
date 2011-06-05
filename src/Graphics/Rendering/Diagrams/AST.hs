@@ -104,6 +104,7 @@ outputImage name width height image =
 runImage (Shape s)      = runShape s
 runImage (Modifier m i) = runModifier m (runImage i)
 runImage (Images c)     = runCombiner c
+runImage Blank          = mempty
 
 --- Internal runners
 
