@@ -28,16 +28,15 @@ o (Modifier (Rotate a) (Modifier (Rotate a') i)) = Just $ Modifier (Rotate (a+a'
 -- Sets of changes
 o (Modifier (Changes [])  i) = Just $ i
 o (Modifier (Changes [c]) i) = Just $ Modifier c i
-o (Modifier (Changes l)   i) = g (f (Left l)) >>= (\q -> return $ q i)
+o (Modifier (Changes l)   i) = g (f (Left l))
   where
-    g (Right l) = Just $ Modifier $ Changes $ l
+    g (Right l) = Just $ Modifier (Changes l) i
     g (Left  l) = Nothing
 
     f (Left  (Scale     x y : Scale     x' y' : l)) = f $ Right $ Scale     (x*x') (y*y') : h (f $ Left l)
     f (Left  (Translate x y : Translate x' y' : l)) = f $ Right $ Translate (x+x') (y+y') : h (f $ Left l)
     f (Left  (Rotate    x   : Rotate    x'    : l)) = f $ Right $ Rotate    (x+x')        : h (f $ Left l)
-    f (Left  l) = Left l
-    f (Right l) = Right l
+    f x = x
 
     h (Left  l) = l
     h (Right l) = l
