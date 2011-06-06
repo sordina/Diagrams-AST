@@ -1,6 +1,6 @@
 import Graphics.Rendering.Diagrams.AST
 import Graphics.Rendering.Diagrams.AST.Optimize
-import Data.Generics.Uniplate.Operations
+import Data.Generics.Uniplate.Data
 
 main = outputImage "../test.png" 300 300 circles
 

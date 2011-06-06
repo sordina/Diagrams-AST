@@ -1,7 +1,7 @@
 module Graphics.Rendering.Diagrams.AST.Optimize ( optimize ) where
 
 import Graphics.Rendering.Diagrams.AST
-import Data.Generics.Uniplate.Operations
+import Data.Generics.Uniplate.Data
 
 -- Using "rewrite" instead of transform (http://community.haskell.org/~ndm/darcs/uniplate/uniplate.htm)
 optimize :: Image -> Image
