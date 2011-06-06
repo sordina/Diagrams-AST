@@ -19,9 +19,7 @@ module Graphics.Rendering.Diagrams.AST (
   ColorData (..),
   Fill      (..),
   Alignment (..),
-
-  -- Newtypes
-  Angle  (..)
+  Angle     (..)
   )
 where
 
