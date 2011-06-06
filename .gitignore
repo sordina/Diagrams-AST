@@ -3,4 +3,5 @@
 *.o
 angles
 gloss
+dist/
 !documentation/chart.png

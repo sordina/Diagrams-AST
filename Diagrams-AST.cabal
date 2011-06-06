@@ -48,14 +48,16 @@ Cabal-version:       >=1.2
 
 Library
   -- Modules exported by the library.
-  -- Exposed-modules: Graphics.Rendering.Diagrams.AST
-  
+  Exposed-modules: Graphics.Rendering.Diagrams.AST, Graphics.Rendering.Diagrams.AST.Helpers, Graphics.Rendering.Diagrams.AST.Optimize
+
   -- Packages needed in order to build this package.
-  Build-depends: diagrams-lib, diagrams-core, diagrams-cairo, gloss
-  
+  Build-depends: diagrams-lib, diagrams-core, diagrams-cairo, gloss, uniplate, base
+
+  hs-source-dirs: src
+
   -- Modules not exported by this package.
-  -- Other-modules:       
-  
+  -- Other-modules:
+
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
-  -- Build-tools:         
-  
+  -- Build-tools:
+
