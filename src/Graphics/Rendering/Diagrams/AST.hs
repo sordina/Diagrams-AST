@@ -133,6 +133,7 @@ instance D.Color ColorData where
 ---- Run ADT Functions
 
 -- | 'outputImage' renders a PNG to the file supplied.
+outputImage :: String -> Int -> Int -> Image -> IO ()
 outputImage name width height image =
   D.renderDia C.Cairo (C.CairoOptions name (C.PNG (width, height))) (runImage image)
 
