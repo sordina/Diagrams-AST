@@ -21,6 +21,9 @@ o (Modifier (Scale x y) (Modifier (Scale x' y') i)) = Just $ Modifier (Scale (x*
 -- Consecutive Translations
 o (Modifier (Translate x y) (Modifier (Translate x' y') i)) = Just $ Modifier (Translate (x+x') (y+y')) i
 
+-- Consecutive Rotations
+o (Modifier (Rotate a) (Modifier (Rotate a') i)) = Just $ Modifier (Rotate (a+a')) i
+
 -- Sets of changes
 o (Modifier (Changes [])  i) = Just $ i
 o (Modifier (Changes [c]) i) = Just $ Modifier c i

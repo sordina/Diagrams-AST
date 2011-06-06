@@ -84,6 +84,18 @@ data Alignment = L | R | T | B | TL | TR | BL | BR | C | CX | CY | X Double | Y 
 
 data Angle = Fraction Double | Radians Double | Degrees Double deriving (Show, Eq, Ord, Data, Typeable)
 
+instance Num Angle
+  where
+    fromInteger x = Fraction $ fromInteger x
+    x + y = Fraction $ (getAngleFraction x) + (getAngleFraction y)
+    x * y = Fraction $ (getAngleFraction x) * (getAngleFraction y)
+    abs x = Fraction $ abs (getAngleFraction x)
+    signum x
+      | x' > 0 = 1
+      | x' < 0 = -1
+      | otherwise = 0
+      where x' = getAngleFraction x
+
 getAngleFraction (Fraction x) = x
 getAngleFraction (Radians  x) = x / (2*pi)
 getAngleFraction (Degrees  x) = x / 360
