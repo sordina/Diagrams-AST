@@ -2,7 +2,6 @@ module Graphics.Rendering.Diagrams.AST.Optimize ( optimize ) where
 
 import Graphics.Rendering.Diagrams.AST
 import Data.Generics.Uniplate.Operations
-import Data.List (sort)
 
 -- Consider using "rewrite" instead of transform (http://community.haskell.org/~ndm/darcs/uniplate/uniplate.htm)
 optimize :: Image -> Image
@@ -24,23 +23,21 @@ o (Modifier (Translate x y) (Modifier (Translate x' y') i)) = Modifier (Translat
 
 o (Modifier (Changes [])  i) = i
 o (Modifier (Changes [c]) i) = Modifier c i
--- o (Modifier (Changes l)   i) = Modifier (Changes (sort l)) i -- Not concatinating yet
 
 -- Removing Blanks from Combinations
--- Sort lists to allow for transformation concatinations
 o (Images (Atop Blank i))   = i
 o (Images (Atop  i Blank))  = i
 o (Images (Above Blank i))  = i
 o (Images (Above i Blank))  = i
 o (Images (Layers     []))  = Blank
 o (Images (Layers     [i])) = i
-o (Images (Layers     xs))  = Images $ Layers $ filter (not.blank) (sort xs)
+o (Images (Layers     xs))  = Images $ Layers $ filter (not.blank) xs
 o (Images (Vertical   []))  = Blank
 o (Images (Vertical   [i])) = i
-o (Images (Vertical   xs))  = Images $ Vertical $ filter (not.blank) (sort xs)
+o (Images (Vertical   xs))  = Images $ Vertical $ filter (not.blank) xs
 o (Images (Horizontal []))  = Blank
 o (Images (Horizontal [i])) = i
-o (Images (Horizontal xs))  = Images $ Horizontal $ filter (not.blank) (sort xs)
+o (Images (Horizontal xs))  = Images $ Horizontal $ filter (not.blank) xs
 
 -- etc, etc
 
