@@ -1,5 +1,7 @@
 {-# LANGUAGE NoMonomorphismRestriction, FlexibleContexts, DeriveDataTypeable #-}
 
+-- | Diagrams-AST provides a data oriented interface to the <http://hackage.haskell.org/package/diagrams> package.
+
 module Graphics.Rendering.Diagrams.AST (
   -- Functions
   outputImage,
@@ -32,7 +34,7 @@ import qualified Diagrams.TwoD.Align                as L
 import qualified Diagrams.Backend.Cairo             as C
 import qualified Graphics.Rendering.Diagrams.Points as P3
 
-import           Diagrams.Prelude ((|||), (===))
+import Diagrams.Prelude ((|||), (===))
 
 -- Data Imports
 import Data.Monoid
@@ -75,13 +77,29 @@ data Path = Offsets [(Double,Double)]
           | Points  [(Double,Double)]
           | Arc Angle Angle deriving (Show, Eq, Ord, Data, Typeable)
 
-data ColorData = RGBA Double Double Double Double
-               | RAA  Double Double Double Double deriving (Show, Eq, Ord, Data, Typeable)
+data ColorData = RGBA Double Double Double Double -- ^ Red, Green, Blue, Alpha
+               | RAA  Double Double Double Double -- ^ Radius, Blue\/Green, (Blue\/Green)\/Red
+               deriving (Show, Eq, Ord, Data, Typeable)
 
 data Fill = Closed | Open deriving (Show, Eq, Ord, Data, Typeable)
 
-data Alignment = L | R | T | B | TL | TR | BL | BR | C | CX | CY | X Double | Y Double deriving (Show, Eq, Ord, Data, Typeable)
+-- | Alignment of the origin of an 'Image'.
+data Alignment = L        -- ^ Left
+               | R        -- ^ Right
+               | T        -- ^ Top
+               | B        -- ^ Bottom
+               | TL       -- ^ Top-Left
+               | TR       -- ^ Top-Right
+               | BL       -- ^ Bottom-Left
+               | BR       -- ^ Bottom-Right
+               | C        -- ^ Center
+               | CX       -- ^ X-Centered
+               | CY       -- ^ Y-Centered
+               | X Double -- ^ X-Proportion (Fraction -1 to 1)
+               | Y Double -- ^ Y-Proportion (Fraction -1 to 1)
+               deriving (Show, Eq, Ord, Data, Typeable)
 
+-- | Angles are instances of Num. 'fromInteger' interprets its argument as a fraction of a full circle.
 data Angle = Fraction Double | Radians Double | Degrees Double deriving (Show, Eq, Ord, Data, Typeable)
 
 instance Num Angle
@@ -96,6 +114,8 @@ instance Num Angle
       | otherwise = 0
       where x' = getAngleFraction x
 
+-- | 'getAngleFraction' returns the fraction of a full circle for any angle.
+getAngleFraction :: Angle -> Double
 getAngleFraction (Fraction x) = x
 getAngleFraction (Radians  x) = x / (2*pi)
 getAngleFraction (Degrees  x) = x / 360
@@ -112,11 +132,13 @@ instance D.Color ColorData where
 
 ---- Run ADT Functions
 
+-- | 'outputImage' renders a PNG to the file supplied.
 outputImage name width height image =
   D.renderDia C.Cairo (C.CairoOptions name (C.PNG (width, height))) (runImage image)
 
 --- Main runner
 
+-- 'runImage' creates a "Graphics.Rendering.Diagrams" image from a "Graphics.Rendering.Diagrams.AST" image.
 runImage (Shape s)      = runShape s
 runImage (Modifier m i) = runModifier m (runImage i)
 runImage (Images c)     = runCombiner c

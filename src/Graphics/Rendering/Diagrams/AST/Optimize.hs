@@ -1,7 +1,23 @@
+
+-- | Optimizations to Image data-structures. Takes advantage of <http://hackage.haskell.org/package/uniplate>.
+
 module Graphics.Rendering.Diagrams.AST.Optimize ( optimize ) where
 
 import Graphics.Rendering.Diagrams.AST
 import Data.Generics.Uniplate.Data
+
+{- | The function 'optimize' takes an Image and returns an equivilant Image that optimizes the structure of the data.
+
+     Optimizations include:
+
+     * Turning @ 0 @ scalings into 'Blank' images
+
+     * Concatinating consecutive scalings, rotations, and translations
+
+     * Removing identity transformations
+
+     * Turning singleton transformation lists into regular transformations
+-}
 
 -- Using "rewrite" instead of transform (http://community.haskell.org/~ndm/darcs/uniplate/uniplate.htm)
 optimize :: Image -> Image
