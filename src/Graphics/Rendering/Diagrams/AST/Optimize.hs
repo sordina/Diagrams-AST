@@ -31,6 +31,7 @@ o (Modifier (Changes l)   i) = Just $ Modifier (Changes (f l)) i
   where
     f (Scale     x y : Scale     x' y' : l) = f $ Scale     (x*x') (y*y') : f l
     f (Translate x y : Translate x' y' : l) = f $ Translate (x+x') (y+y') : f l
+    f (Rotate    x   : Rotate    x'    : l) = f $ Rotate    (x+x')        : f l
     f l = l
 
 -- Removing Blanks from Combinations
