@@ -2,6 +2,7 @@ module Graphics.Rendering.Diagrams.AST.Optimize ( optimize ) where
 
 import Graphics.Rendering.Diagrams.AST
 import Data.Generics.Uniplate.Data
+import Control.Monad.Writer
 
 -- Using "rewrite" instead of transform (http://community.haskell.org/~ndm/darcs/uniplate/uniplate.htm)
 optimize :: Image -> Image
@@ -27,12 +28,19 @@ o (Modifier (Rotate a) (Modifier (Rotate a') i)) = Just $ Modifier (Rotate (a+a'
 -- Sets of changes
 o (Modifier (Changes [])  i) = Just $ i
 o (Modifier (Changes [c]) i) = Just $ Modifier c i
-o (Modifier (Changes l)   i) = Just $ Modifier (Changes (f l)) i
+o (Modifier (Changes l)   i) = g (f (Left l)) >>= (\q -> return $ q i)
   where
-    f (Scale     x y : Scale     x' y' : l) = f $ Scale     (x*x') (y*y') : f l
-    f (Translate x y : Translate x' y' : l) = f $ Translate (x+x') (y+y') : f l
-    f (Rotate    x   : Rotate    x'    : l) = f $ Rotate    (x+x')        : f l
-    f l = l
+    g (Right l) = Just $ Modifier $ Changes $ l
+    g (Left  l) = Nothing
+
+    f (Left  (Scale     x y : Scale     x' y' : l)) = f $ Right $ Scale     (x*x') (y*y') : h (f $ Left l)
+    f (Left  (Translate x y : Translate x' y' : l)) = f $ Right $ Translate (x+x') (y+y') : h (f $ Left l)
+    f (Left  (Rotate    x   : Rotate    x'    : l)) = f $ Right $ Rotate    (x+x')        : h (f $ Left l)
+    f (Left  l) = Left l
+    f (Right l) = Right l
+
+    h (Left  l) = l
+    h (Right l) = l
 
 -- Removing Blanks from Combinations
 o (Images (Atop Blank i))   = Just $ i
