@@ -31,6 +31,10 @@ o (Modifier (Scale 0 _) _) = Just $ Blank
 o (Modifier (Scale _ 0) _) = Just $ Blank
 o (Modifier (Scale 1 1) i) = Just $ i
 
+o (Modifier (Rotate 0) i) = Just i
+
+o (Modifier (Translate 0 0) i) = Just i
+
 -- Consecutive Scales
 o (Modifier (Scale x y) (Modifier (Scale x' y') i)) = Just $ Modifier (Scale (x*x') (y*y')) i
 
@@ -63,13 +67,19 @@ o (Images (Above Blank i))  = Just $ i
 o (Images (Above i Blank))  = Just $ i
 o (Images (Layers     []))  = Just $ Blank
 o (Images (Layers     [i])) = Just $ i
-o (Images (Layers     xs))  = Just $ Images $ Layers $ filter (not.blank) xs
 o (Images (Vertical   []))  = Just $ Blank
 o (Images (Vertical   [i])) = Just $ i
-o (Images (Vertical   xs))  = Just $ Images $ Vertical $ filter (not.blank) xs
 o (Images (Horizontal []))  = Just $ Blank
 o (Images (Horizontal [i])) = Just $ i
-o (Images (Horizontal xs))  = Just $ Images $ Horizontal $ filter (not.blank) xs
+o (Images (Horizontal xs))
+  | any blank xs = Just $ Images $ Horizontal $ filter (not.blank) xs
+  | otherwise    = Nothing
+o (Images (Vertical   xs))
+  | any blank xs = Just $ Images $ Vertical $ filter (not.blank) xs
+  | otherwise    = Nothing
+o (Images (Layers     xs))
+  | any blank xs = Just $ Images $ Layers $ filter (not.blank) xs
+  | otherwise    = Nothing
 
 -- Default
 o x = Nothing
