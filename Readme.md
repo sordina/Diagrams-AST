@@ -6,9 +6,8 @@ Diagrams AST (Abstract Syntax Tree)
 Diagrams AST provides a data oriented interface to the
 <a href="http://hackage.haskell.org/package/diagrams-core">Graphics.Rendering.Diagrams</a> package.
 
-This can be useful as it allows inspection and modification of diagrams.
-
-For example: <a href="Diagrams-AST/blob/master/src/Graphics/Rendering/Diagrams/AST/Optimize.hs">Automatic Optimizations</a>
+This can be useful as it allows inspection and modification of diagrams. For example:
+<a href="https://github.com/sordina/Diagrams-AST/blob/master/src/Graphics/Rendering/Diagrams/AST/Optimize.hs">Automatic Optimizations</a>
 
 ## Example:
 
