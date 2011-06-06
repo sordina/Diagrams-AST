@@ -3,11 +3,8 @@ import System.Random
 
 main = mapM_ step [1..100]
 
-step n = do
-  print n
-  ps <- paths
-  outputImage ("arrow.png") 600 600 $
-    Modifier (Pad 1.1) $ Images $ Layers (circle : ps)
+step n = outputImage ("arrow.png") 600 600 $
+    Modifier (Pad 1.1) $ Images $ Layers (circle : paths)
 
 paths :: IO [Image]
 paths = do

@@ -1,4 +1,4 @@
-{-# LANGUAGE NoMonomorphismRestriction, FlexibleContexts #-}
+{-# LANGUAGE NoMonomorphismRestriction, FlexibleContexts, DeriveDataTypeable #-}
 
 module Graphics.Rendering.Diagrams.AST (
   -- Functions
@@ -38,12 +38,16 @@ import           Diagrams.Prelude ((|||), (===))
 import Data.Monoid
 import Data.List (foldl')
 
+-- Meta
+import Data.Generics.Uniplate.Data
+import Data.Data
+
 --- Data Types
 
 data Image = Blank
            | Shape Shape
            | Modifier Modifier Image
-           | Images Images deriving (Show, Eq, Ord)
+           | Images Images deriving (Show, Eq, Ord, Data, Typeable)
 
 data Modifier = Foreground       ColorData
               | LineColor        ColorData
@@ -56,29 +60,29 @@ data Modifier = Foreground       ColorData
               | Freeze
               | Origin
               | Align Alignment
-              | Changes [Modifier] deriving (Show, Eq, Ord)
+              | Changes [Modifier] deriving (Show, Eq, Ord, Data, Typeable)
 
 data Images = Atop   Image Image
             | NextTo Image Image
             | Above  Image Image
             | Layers     [Image]
             | Horizontal [Image]
-            | Vertical   [Image] deriving (Show, Eq, Ord)
+            | Vertical   [Image] deriving (Show, Eq, Ord, Data, Typeable)
 
-data Shape = Circle | Square | Path Fill Path deriving (Show, Eq, Ord)
+data Shape = Circle | Square | Path Fill Path deriving (Show, Eq, Ord, Data, Typeable)
 
 data Path = Offsets [(Double,Double)]
           | Points  [(Double,Double)]
-          | Arc Angle Angle deriving (Show, Eq, Ord)
+          | Arc Angle Angle deriving (Show, Eq, Ord, Data, Typeable)
 
 data ColorData = RGBA Double Double Double Double
-               | RAA  Double Double Double Double deriving (Show, Eq, Ord)
+               | RAA  Double Double Double Double deriving (Show, Eq, Ord, Data, Typeable)
 
-data Fill = Closed | Open deriving (Show, Eq, Ord)
+data Fill = Closed | Open deriving (Show, Eq, Ord, Data, Typeable)
 
-data Alignment = L | R | T | B | TL | TR | BL | BR | C | CX | CY | X Double | Y Double deriving (Show, Eq, Ord)
+data Alignment = L | R | T | B | TL | TR | BL | BR | C | CX | CY | X Double | Y Double deriving (Show, Eq, Ord, Data, Typeable)
 
-data Angle = Fraction Double | Radians Double | Degrees Double deriving (Show, Eq, Ord)
+data Angle = Fraction Double | Radians Double | Degrees Double deriving (Show, Eq, Ord, Data, Typeable)
 
 getAngleFraction (Fraction x) = x
 getAngleFraction (Radians  x) = x / (2*pi)

@@ -1,4 +1,5 @@
 import Graphics.Rendering.Diagrams.AST
+import Data.Generics.Uniplate.Operations
 
 main = outputImage "../test.png" 300 300 circles
 

@@ -40,7 +40,7 @@ fromGloss (G.Color c p)        = Modifier (Foreground $ color c) (fromGloss p)
 fromGloss (G.Translate x y p)  = Modifier (Translate (d x) (d y)) (fromGloss p)
 fromGloss (G.Rotate r p)       = Modifier (Rotate $ Degrees (d r)) (fromGloss p)
 fromGloss (G.Scale x y p)      = Modifier (Scale (d x) (d y)) (fromGloss p)
-fromGloss (G.Pictures l) = Images . Layers . map fromGloss $ l
+fromGloss (G.Pictures l)       = Images . Layers . map fromGloss $ l
 
 toGloss :: Image -> G.Picture
 toGloss = undefined
