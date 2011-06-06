@@ -8,6 +8,8 @@ Diagrams AST provides a data oriented interface to the
 
 This can be useful as it allows inspection and modification of diagrams.
 
+For example: <a href="blob/master/src/Graphics/Rendering/Diagrams/AST/Optimize.hs">Automatic Optimizations</a>
+
 ## Example:
 
 	import Graphics.Rendering.Diagrams.AST
