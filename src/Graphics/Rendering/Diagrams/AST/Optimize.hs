@@ -45,16 +45,17 @@ o (Modifier (Translate x y) (Modifier (Translate x' y') i)) = Just $ Modifier (T
 -- Consecutive Rotations
 o (Modifier (Rotate a) (Modifier (Rotate a') i)) = Just $ Modifier (Rotate (a+a')) i
 
+-- Rotate a Circle? WTF?
+o (Modifier (Rotate a) (Shape Circle)) = Just $ Shape Circle
+
 -- Sets of changes
 o (Modifier (Changes [])  i) = Just i
 o (Modifier (Changes [c]) i) = Just $ Modifier c i
-o (Modifier (Changes l)   i) = f l >>= Just . flip Modifier i . Changes
+o (Modifier (Changes l)   i)
+  | l == ml   = Nothing
+  | otherwise = Just $ Modifier (Changes (deBlank l)) i -- This surely has poor performance
   where
-    f (Rotate    x   : Rotate    x'    : cs) = Just $ g (Rotate    (x+x')        : g cs)
-    f (Scale     x y : Scale     x' y' : cs) = Just $ g (Scale     (x*x') (y*y') : g l)
-    f (Translate x y : Translate x' y' : cs) = Just $ g (Translate (x+x') (y+y') : g l)
-    f _ = Nothing
-    g l = fromMaybe l (f l)
+    ml = deBlank l
 
 -- Removing Blanks from Combinations
 o (Images (Atop Blank i))   = Just i
@@ -84,3 +85,11 @@ o x = Nothing
 blank :: Image -> Bool
 blank Blank = True
 blank _     = False
+
+deBlank :: [Modifier] -> [Modifier]
+deBlank = rewrite db
+
+db (Rotate    x   : Rotate    x'    : l) = Just (Rotate    (x+x')        : l)
+db (Scale     x y : Scale     x' y' : l) = Just (Scale     (x*x') (y*y') : l)
+db (Translate x y : Translate x' y' : l) = Just (Translate (x+x') (y+y') : l)
+db _ = Nothing
