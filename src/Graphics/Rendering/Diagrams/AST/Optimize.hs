@@ -22,18 +22,22 @@ import Data.Maybe
 
 -- Using "rewrite" instead of transform (http://community.haskell.org/~ndm/darcs/uniplate/uniplate.htm)
 optimize :: Image -> Image
-optimize = rewrite o
+optimize = reList . rewrite o . deList
 
 -- Don't modify blank images
 o (Modifier _ Blank) = Just Blank
 
 -- Leaving the debate about pattern-matching on doubles until later
+
+-- Identity scaling
 o (Modifier (Scale 0 _) _) = Just Blank
 o (Modifier (Scale _ 0) _) = Just Blank
 o (Modifier (Scale 1 1) i) = Just i
 
+-- Identity rotations
 o (Modifier (Rotate 0) i) = Just i
 
+-- Identity translations
 o (Modifier (Translate 0 0) i) = Just i
 
 -- Consecutive Scales
@@ -48,48 +52,53 @@ o (Modifier (Rotate a) (Modifier (Rotate a') i)) = Just $ Modifier (Rotate (a+a'
 -- Rotate a Circle? WTF?
 o (Modifier (Rotate a) (Shape Circle)) = Just $ Shape Circle
 
--- Sets of changes
-o (Modifier (Changes [])  i) = Just i
-o (Modifier (Changes [c]) i) = Just $ Modifier c i
-o (Modifier (Changes l)   i)
-  | l == ml   = Nothing
-  | otherwise = Just $ Modifier (Changes (deBlank l)) i -- This surely has poor performance
-  where
-    ml = deBlank l
-
 -- Removing Blanks from Combinations
-o (Images (Atop Blank i))   = Just i
-o (Images (Atop  i Blank))  = Just i
-o (Images (Above Blank i))  = Just i
-o (Images (Above i Blank))  = Just i
-o (Images (Layers     []))  = Just Blank
-o (Images (Layers     [i])) = Just i
-o (Images (Vertical   []))  = Just Blank
-o (Images (Vertical   [i])) = Just i
-o (Images (Horizontal []))  = Just Blank
-o (Images (Horizontal [i])) = Just i
-o (Images (Horizontal xs))
-  | any blank xs = Just $ Images $ Horizontal $ filter (not.blank) xs
-  | otherwise    = Nothing
-o (Images (Vertical   xs))
-  | any blank xs = Just $ Images $ Vertical $ filter (not.blank) xs
-  | otherwise    = Nothing
-o (Images (Layers     xs))
-  | any blank xs = Just $ Images $ Layers $ filter (not.blank) xs
-  | otherwise    = Nothing
+o (Images (Atop Blank i))    = Just i
+o (Images (Atop  i Blank))   = Just i
+o (Images (Above Blank i))   = Just i
+o (Images (Above i Blank))   = Just i
+o (Images (NextTo Blank i))  = Just i
+o (Images (NextTo i Blank))  = Just i
 
 -- Default
 o x = Nothing
 
 -- Helpers
-blank :: Image -> Bool
-blank Blank = True
-blank _     = False
 
-deBlank :: [Modifier] -> [Modifier]
-deBlank = rewrite db
+deList :: Image -> Image
+deList = transform d
+  where
+    -- Changes
+    d (Modifier (Changes []) i) = i
+    d (Modifier (Changes l)  i) = (foldl1 (.) . map Modifier $ l) i
+    -- Layers
+    d (Images (Layers [])) = Blank
+    d (Images (Layers l))  = f Atop l
+    -- Vertical
+    d (Images (Vertical [])) = Blank
+    d (Images (Vertical l))  = f Above l
+    -- Horizontal
+    d (Images (Horizontal [])) = Blank
+    d (Images (Horizontal l))  = f NextTo l
+    -- Default
+    d i = i
+    -- Helpers
+    f c = foldr (Images `owl` c) Blank where owl = (.).(.)
 
-db (Rotate    x   : Rotate    x'    : l) = Just (Rotate    (x+x')        : l)
-db (Scale     x y : Scale     x' y' : l) = Just (Scale     (x*x') (y*y') : l)
-db (Translate x y : Translate x' y' : l) = Just (Translate (x+x') (y+y') : l)
-db _ = Nothing
+reList :: Image -> Image
+reList = rewrite r
+  where
+    -- Modifications
+    r (Modifier m (Modifier (Changes l) i)) = Just $ Modifier (Changes (m:l))   i
+    r (Modifier m (Modifier m'          i)) = Just $ Modifier (Changes [m, m']) i
+    -- Atop
+    r (Images (Atop i (Images (Layers l)))) = Just $ Images $ Layers (i:l)
+    r (Images (Atop i (Images (Atop j k)))) = Just $ Images $ Layers [i, j, k]
+    -- Above
+    r (Images (Above i (Images (Vertical l)))) = Just $ Images $ Vertical (i:l)
+    r (Images (Above i (Images (Above j k))))  = Just $ Images $ Vertical [i, j, k]
+    -- NextTo
+    r (Images (NextTo i (Images (Horizontal l)))) = Just $ Images $ Horizontal (i:l)
+    r (Images (NextTo i (Images (NextTo j k))))   = Just $ Images $ Horizontal [i, j, k]
+    -- Default
+    r _ = Nothing
