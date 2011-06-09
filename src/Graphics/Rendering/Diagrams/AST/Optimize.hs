@@ -5,7 +5,6 @@ module Graphics.Rendering.Diagrams.AST.Optimize ( optimize ) where
 
 import Graphics.Rendering.Diagrams.AST
 import Data.Generics.Uniplate.Data
-import Data.Maybe
 
 {- | The function 'optimize' takes an Image and returns an equivilant Image that optimizes the structure of the data.
 
@@ -50,7 +49,7 @@ o (Modifier (Translate x y) (Modifier (Translate x' y') i)) = Just $ Modifier (T
 o (Modifier (Rotate a) (Modifier (Rotate a') i)) = Just $ Modifier (Rotate (a+a')) i
 
 -- Rotate a Circle? WTF?
-o (Modifier (Rotate a) (Shape Circle)) = Just $ Shape Circle
+o (Modifier (Rotate _) (Shape Circle)) = Just $ Shape Circle
 
 -- Removing Blanks from Combinations
 o (Images (Atop Blank i))    = Just i
@@ -61,7 +60,7 @@ o (Images (NextTo Blank i))  = Just i
 o (Images (NextTo i Blank))  = Just i
 
 -- Default
-o x = Nothing
+o _ = Nothing
 
 -- Helpers
 
