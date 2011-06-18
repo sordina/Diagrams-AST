@@ -7,7 +7,7 @@ import qualified Graphics.Gloss.Data.Picture as G
 import qualified Graphics.Gloss.Data.Color as C
 import Graphics.Rendering.Diagrams.AST
 
-{- Gloss:
+{-| Gloss:
 
 data Picture - A 2D picture
 
