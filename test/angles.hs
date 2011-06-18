@@ -1,4 +1,4 @@
-import Graphics.Rendering.Diagrams.AST
+import Diagrams.AST
 import System.Random
 
 main = mapM_ step [1..100]

@@ -1,33 +1,20 @@
 import Graphics.Rendering.Diagrams.AST
 import System.Random
+import Control.Arrow
 
-main = mapM_ step [1..100]
+main = outputImage ("arrow.png") 1366 768 $ Images $ Horizontal $ map h [0..4]
 
-step n = outputImage ("arrow.png") 600 600 $
-    Modifier (Pad 1.1) $ Images $ Layers (circle : paths)
+h x = Images $ Vertical $ map (v x) [0..4]
 
-paths :: IO [Image]
-paths = do
-  r1 <- range (-5,5)
-  r2 <- range (-5,5)
-  c1 <- range  (0,1)
-  c2 <- range  (0,1)
-  return $ zipWith shape
-    (zipWith color c1 c2)
-    (take 100 $ chunk 5 $ zip r1 r2)
+v x y = arrow (x/5) (y/5)
 
-shape c l = Modifier (Changes [Foreground c, LineWidth 0.05]) $
-            Shape $
-            Path Closed $
-            Offsets l
+arrow g e =
+    Modifier (Changes [LineWidth 0.1, Foreground (color g e), Align CX, Pad 1.01]) $
+    Shape $
+    Path Closed $
+    Offsets $ forwards ++ backwards
 
-chunk n [] = []
-chunk n xs = take n xs : chunk n (drop n xs)
-
-range b = do
-  g <- newStdGen
-  return $ randomRs b g
+forwards  = [ (0,1), (5,0), (0,1), (3,-2) ]
+backwards = map (first negate) (reverse forwards)
 
 color g e = RAA 1 g e 0.94
-
-circle = Modifier (Scale 30 30) $ Shape Circle
