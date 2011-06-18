@@ -1,3 +1,5 @@
+{-# OPTIONS -fno-warn-overlapping-patterns #-}
+
 -- | Optimizations to Image data-structures. Takes advantage of <http://hackage.haskell.org/package/uniplate>.
 
 module Diagrams.AST.Optimize ( optimize ) where

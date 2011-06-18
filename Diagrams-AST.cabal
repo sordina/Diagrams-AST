@@ -13,7 +13,7 @@ Version:             0.2
 Synopsis:            Abstract Syntax Tree for the Haskell Diagrams Package
 
 -- A longer description of the package.
--- Description:         
+-- Description:
 
 -- URL for the project homepage or repository.
 Homepage:            https://github.com/sordina/Diagrams-AST
@@ -40,7 +40,7 @@ Build-type:          Simple
 
 -- Extra files to be distributed with the package, such as examples or
 -- a README.
--- Extra-source-files:  
+-- Extra-source-files:
 
 -- Constraint on the version of Cabal needed to build this package.
 Cabal-version:       >=1.2
@@ -50,12 +50,21 @@ Library
   -- Modules exported by the library.
   Exposed-modules:
     Diagrams.Gloss,
+    Diagrams.Backend.Image,
     Diagrams.AST,
     Diagrams.AST.Helpers,
     Diagrams.AST.Optimize
 
   -- Packages needed in order to build this package.
-  Build-depends: diagrams-lib, diagrams-core, diagrams-cairo, gloss, uniplate, base
+  Build-depends:
+    pretty,
+    vector-space,
+    diagrams-lib,
+    diagrams-core,
+    diagrams-cairo,
+    gloss,
+    uniplate,
+    base
 
   hs-source-dirs: src
 
