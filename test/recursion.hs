@@ -1,8 +1,8 @@
-import Graphics.Rendering.Diagrams.AST
+import Diagrams.AST
 
 main     = outputImage "recursion.png" 300 300 pilla
 pilla    = Images $ Atop face body
-face     =  Modifier (Scale 0.3 0.3) $ Images $ Horizontal [pcirc, pcirc]
+face     = Modifier (Scale 0.3 0.3) $ Images $ Horizontal [pcirc, pcirc]
 pcirc    = Modifier (Foreground black) $ Shape Circle
 body     = circles !! 50
 circles  = iterate (Images . Atop circle . modifier) Blank
