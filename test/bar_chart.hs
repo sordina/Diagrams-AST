@@ -1,4 +1,4 @@
-import Graphics.Rendering.Diagrams.AST
+import Diagrams.AST
 import System.Random
 import Control.Applicative
 import Data.List (sort)

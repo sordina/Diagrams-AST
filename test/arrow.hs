@@ -1,4 +1,4 @@
-import Graphics.Rendering.Diagrams.AST
+import Diagrams.AST
 import Control.Arrow
 
 main = outputImage "arrow.png" 1366 768 $ Images $ Horizontal $ map h [0..4]

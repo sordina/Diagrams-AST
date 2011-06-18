@@ -1,6 +1,6 @@
-import Graphics.Rendering.Diagrams.AST
-import Graphics.Rendering.Diagrams.AST.Helpers
-import Graphics.Rendering.Diagrams.AST.Optimize
+import Diagrams.AST
+import Diagrams.AST.Helpers
+import Diagrams.AST.Optimize
 import System.Random
 import Control.Applicative
 import Data.List (sort)

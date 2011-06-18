@@ -1,5 +1,5 @@
-import qualified Graphics.Rendering.Diagrams.AST as D
-import qualified Graphics.Rendering.Diagrams.Gloss as G
+import qualified Diagrams.AST as D
+import qualified Diagrams.Gloss as G
 import Graphics.Gloss
 
 image = Color red $ Circle 80
