@@ -1,6 +1,6 @@
-module Graphics.Rendering.Diagrams.AST.Helpers ( barchart, linechart ) where
+module Diagrams.AST.Helpers ( barchart, linechart ) where
 
-import Graphics.Rendering.Diagrams.AST
+import Diagrams.AST
 
 barchart :: ColorData -> [Double] -> Image
 barchart color = Images . Horizontal . map bar

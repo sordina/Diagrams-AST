@@ -1,9 +1,9 @@
 
 -- | Optimizations to Image data-structures. Takes advantage of <http://hackage.haskell.org/package/uniplate>.
 
-module Graphics.Rendering.Diagrams.AST.Optimize ( optimize ) where
+module Diagrams.AST.Optimize ( optimize ) where
 
-import Graphics.Rendering.Diagrams.AST
+import Diagrams.AST
 import Data.Generics.Uniplate.Data
 
 {- | The function 'optimize' takes an Image and returns an equivilant Image that optimizes the structure of the data.

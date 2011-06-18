@@ -13,10 +13,10 @@
 -- License     :  BSD-style (see LICENSE)
 -- Maintainer  :  maydwell@gmail.com
 --
--- A Picture AST diagrams backend
+-- An Image-AST diagrams backend
 --
 -----------------------------------------------------------------------------
-module Diagrams.Backend.Show where
+module Diagrams.Backend.Image where
 
 import Diagrams.Prelude
 

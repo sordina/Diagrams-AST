@@ -2,7 +2,7 @@
 
 -- | Diagrams-AST provides a data oriented interface to the <http://hackage.haskell.org/package/diagrams> package.
 
-module Graphics.Rendering.Diagrams.AST (
+module Diagrams.AST (
   -- Functions
   outputImage,
   runImage,
