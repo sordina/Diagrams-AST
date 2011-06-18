@@ -1,4 +1,3 @@
-
 -- | Optimizations to Image data-structures. Takes advantage of <http://hackage.haskell.org/package/uniplate>.
 
 module Diagrams.AST.Optimize ( optimize ) where
@@ -33,8 +32,19 @@ o (Modifier (Scale 0 _) _) = Just Blank
 o (Modifier (Scale _ 0) _) = Just Blank
 o (Modifier (Scale 1 1) i) = Just i
 
--- Identity rotations
-o (Modifier (Rotate 0) i) = Just i
+-- Rotate a Circle? WTF?
+o (Modifier (Rotate _) (Shape Circle)) = Just $ Shape Circle
+
+-- Identity rotations - Monoidal properties on angle
+o (Modifier (Rotate r') i)
+  | norm r' == 0     = Just i
+  | r' > 1 || r' < 0 = Just $ Modifier (Rotate $ norm r') i
+  | otherwise        = Nothing
+  where
+    norm r
+      | r > 1     = norm (r-1)
+      | r < 0     = norm (r+1)
+      | otherwise = r
 
 -- Identity translations
 o (Modifier (Translate 0 0) i) = Just i
@@ -47,9 +57,6 @@ o (Modifier (Translate x y) (Modifier (Translate x' y') i)) = Just $ Modifier (T
 
 -- Consecutive Rotations
 o (Modifier (Rotate a) (Modifier (Rotate a') i)) = Just $ Modifier (Rotate (a+a')) i
-
--- Rotate a Circle? WTF?
-o (Modifier (Rotate _) (Shape Circle)) = Just $ Shape Circle
 
 -- Removing Blanks from Combinations
 o (Images (Atop Blank i))    = Just i
