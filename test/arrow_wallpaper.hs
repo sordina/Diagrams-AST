@@ -13,7 +13,7 @@ image x y = outputImage "arrow.png" (getX x) (getY y) $ Images $ Horizontal $ ma
 
 h w y x = Images $ Vertical $ flip map [0..y] $ \v -> arrow (2*pi*x/w) (2*pi*v/y)
 
-arrow g e = Modifier (Changes [LineWidth 0, Foreground (RAA 1 g e 0.4), Align CX]) $ Shape $ Path Closed $ Offsets path
+arrow g e = Modifier (Changes [LineWidth 0, Foreground (RAA 1 (Radians g) (Radians e) 0.4), Align CX]) $ Shape $ Path Closed $ Offsets path
 
 forwards  = [ (0,1), (5,0), (0,1), (3,-2) ]
 backwards = map (first negate) (reverse forwards)

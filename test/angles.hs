@@ -31,6 +31,6 @@ range b = do
   g <- newStdGen
   return $ randomRs b g
 
-color g e = RAA 1 g e 0.94
+color g e = RAA 1 (Radians g) (Radians e) 0.94
 
 circle = Modifier (Scale 30 30) $ Shape Circle

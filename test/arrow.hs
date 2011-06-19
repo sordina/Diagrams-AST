@@ -7,7 +7,7 @@ h x = Images $ Vertical $ map (v x) [0..4]
 
 v x y = arrow (x/5) (y/5)
 
-arrow g e = Modifier (Changes [LineWidth 0.1, Foreground (RAA 1 g e 0.94), Align CX, Pad 1.01]) $
+arrow g e = Modifier (Changes [LineWidth 0.1, Foreground (RAA 1 (Radians g) (Radians e) 0.94), Align CX, Pad 1.01]) $
     Shape $
     Path Closed $ Offsets $ forwards ++ backwards
 

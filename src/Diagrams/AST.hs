@@ -126,7 +126,8 @@ instance D.Color ColorData where
   colorToRGBA (RGBA r g b a) = (r, g, b, a)
   colorToRGBA (RAA  r g e a) = ( r * cos g' * cos e',
                                  r * cos g' * sin e',
-                                 r * sin g', a )      where [g', e'] = map getAngleRadians [g, e]
+                                 r * sin g',
+                                 a ) where [g', e'] = map getAngleRadians [g, e]
 
 ---- Run ADT Functions
 
