@@ -76,7 +76,7 @@ data Path = Offsets [(Double,Double)]
           | Arc Angle Angle deriving (Show, Eq, Ord, Data, Typeable)
 
 data ColorData = RGBA Double Double Double Double -- ^ Red, Green, Blue, Alpha
-               | RAA  Double Double Double Double -- ^ Radius, Blue\/Green, (Blue\/Green)\/Red
+               | RAA  Double Angle Angle Double -- ^ Radius, Blue\/Green, (Blue\/Green)\/Red
                deriving (Show, Eq, Ord, Data, Typeable)
 
 data Fill = Closed | Open deriving (Show, Eq, Ord, Data, Typeable)
@@ -124,9 +124,9 @@ getAngleDegrees = (* 360)        . getAngleFraction
 
 instance D.Color ColorData where
   colorToRGBA (RGBA r g b a) = (r, g, b, a)
-  colorToRGBA (RAA  r g e a) = ( r * cos g * cos e,
-                                 r * cos g * sin e,
-                                 r * sin g, a )
+  colorToRGBA (RAA  r g e a) = ( r * cos g' * cos e',
+                                 r * cos g' * sin e',
+                                 r * sin g', a )      where [g', e'] = map getAngleRadians [g, e]
 
 ---- Run ADT Functions
 
