@@ -8,7 +8,7 @@
   #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Diagrams.Backend.Show
+-- Module      :  Diagrams.Backend.Image
 -- Copyright   :  (c) 2011 Lyndon Maydwell (see LICENSE)
 -- License     :  BSD-style (see LICENSE)
 -- Maintainer  :  maydwell@gmail.com
@@ -30,18 +30,18 @@ import qualified Text.PrettyPrint as PP
 import Data.List (transpose)
 
 -- | Token for identifying this backend.
-data ShowBackend = ShowBackend
+data ImageBackend = ImageBackend
 
-instance HasLinearMap v => Backend ShowBackend v where
-  data Render  ShowBackend v = SR Doc
-  type Result  ShowBackend v = String
-  data Options ShowBackend v = SBOpt
+instance HasLinearMap v => Backend ImageBackend v where
+  data Render  ImageBackend v = SR Doc
+  type Result  ImageBackend v = String
+  data Options ImageBackend v = SBOpt
 
   withStyle _ _ _ r = r -- XXX FIXME
 
   doRender _ _ (SR r) = PP.render r
 
-instance Monoid (Render ShowBackend v) where
+instance Monoid (Render ImageBackend v) where
   mempty = SR empty
   (SR d1) `mappend` (SR d2) = SR (d1 $+$ d2)
 
@@ -66,16 +66,16 @@ renderMat :: Show a => [[a]] -> Doc
 renderMat = PP.vcat . map renderRow . transpose
   where renderRow = parens . hsep . map (text . show)
 
-instance Renderable Ellipse ShowBackend where
+instance Renderable Ellipse ImageBackend where
   render _ (Ellipse t) = SR $ text "Ellipse (" $+$
                                 (nest 2 (renderTransf t)) $+$
                               text ")"
 
-instance (Show v, HasLinearMap v) => Renderable (Segment v) ShowBackend where
+instance (Show v, HasLinearMap v) => Renderable (Segment v) ImageBackend where
   render _ s = SR $ text (show s)
 
-instance (Show v, HasLinearMap v) => Renderable (Trail v) ShowBackend where
+instance (Show v, HasLinearMap v) => Renderable (Trail v) ImageBackend where
   render _ t = SR $ text (show t)
 
-instance (Ord v, Show v, HasLinearMap v) => Renderable (Path v) ShowBackend where
+instance (Ord v, Show v, HasLinearMap v) => Renderable (Path v) ImageBackend where
   render _ p = SR $ text (show p)
