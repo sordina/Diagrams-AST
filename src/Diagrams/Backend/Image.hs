@@ -15,67 +15,41 @@
 --
 -- An Image-AST diagrams backend
 --
------------------------------------------------------------------------------
+-- "Abstract diagrams are rendered to particular formats by backends. Each
+-- backend/vector space combination must be an instance of the Backend class. A
+-- minimal complete definition consists of the three associated types and
+-- implementations for withStyle and doRender."
+
+{-
+class (HasLinearMap v, Monoid (Render b v)) => Backend b v where
+  withStyle ::
+    b -> Style -> Transformation v -> Render b v -> Render b v
+  doRender :: b -> Options b v -> Render b v -> Result b v
+  adjustDia ::
+    Monoid m =>
+    b -> Options b v -> AnnDiagram b v m -> AnnDiagram b v m
+  renderDia ::
+    (InnerSpace v, OrderedField (Scalar v), Monoid m) =>
+    b -> Options b v -> AnnDiagram b v m -> Result b v
+    -- Defined in Graphics.Rendering.Diagrams.Core
+-}
+
 module Diagrams.Backend.Image where
 
 import Diagrams.Prelude
-
-import Diagrams.TwoD.Ellipse
-
-import Data.Basis
-
-import Text.PrettyPrint (Doc, empty, ($+$), parens, hsep, text, nest)
-import qualified Text.PrettyPrint as PP
-
-import Data.List (transpose)
+import qualified Diagrams.AST as AST
 
 -- | Token for identifying this backend.
 data ImageBackend = ImageBackend
 
 instance HasLinearMap v => Backend ImageBackend v where
-  data Render  ImageBackend v = SR Doc
-  type Result  ImageBackend v = String
+  data Render  ImageBackend v = SR AST.Image
+  type Result  ImageBackend v = AST.Image
   data Options ImageBackend v = SBOpt
 
-  withStyle _ _ _ r = r -- XXX FIXME
-
-  doRender _ _ (SR r) = PP.render r
+  withStyle _ _ _      r = r -- XXX FIXME
+  doRender  _ _ (SR r)   = r -- Ignore options for now
 
 instance Monoid (Render ImageBackend v) where
-  mempty = SR empty
-  (SR d1) `mappend` (SR d2) = SR (d1 $+$ d2)
-
-renderTransf :: forall v. (Num (Scalar v), HasLinearMap v)
-             => Transformation v -> Doc
-renderTransf t = renderMat mat
-  where tr :: v
-        tr    = transl t
-        basis :: [Basis v]
-        basis = map fst (decompose tr)
-        es :: [v]
-        es    = map basisValue basis
-        vmat :: [v]
-        vmat = map (apply t) es
-        mat :: [[Scalar v]]
-        mat = map decompV vmat
---        mat' :: [[Scalar v]]
---        mat'  = map (++[0]) mat ++ [decompV tr ++ [1]]
-        decompV = map snd . decompose
-
-renderMat :: Show a => [[a]] -> Doc
-renderMat = PP.vcat . map renderRow . transpose
-  where renderRow = parens . hsep . map (text . show)
-
-instance Renderable Ellipse ImageBackend where
-  render _ (Ellipse t) = SR $ text "Ellipse (" $+$
-                                (nest 2 (renderTransf t)) $+$
-                              text ")"
-
-instance (Show v, HasLinearMap v) => Renderable (Segment v) ImageBackend where
-  render _ s = SR $ text (show s)
-
-instance (Show v, HasLinearMap v) => Renderable (Trail v) ImageBackend where
-  render _ t = SR $ text (show t)
-
-instance (Ord v, Show v, HasLinearMap v) => Renderable (Path v) ImageBackend where
-  render _ p = SR $ text (show p)
+  mempty  = undefined
+  mappend = undefined

@@ -112,6 +112,10 @@ instance Num Angle
       | otherwise = 0
       where x' = getAngleFraction x
 
+instance D.Angle Angle where
+  toCircleFrac a                  = D.CircleFrac $ getAngleFraction a
+  fromCircleFrac (D.CircleFrac d) = Fraction d
+
 -- | 'getAngleFraction' returns the fraction of a full circle for any angle.
 getAngleFraction :: Angle -> Double
 getAngleFraction (Fraction x) = x
@@ -133,12 +137,18 @@ instance D.Color ColorData where
 
 -- | 'outputImage' renders a PNG to the file supplied.
 outputImage :: String -> Int -> Int -> Image -> IO ()
-outputImage name width height image =
-  D.renderDia C.Cairo (C.CairoOptions name (C.PNG (width, height))) (runImage image)
+outputImage name width height image = do
+  -- Is a Result type in Cairo a pair a la State?
+  -- No idea why I should need to call fst otherwise
+  -- D.renderDia :: b -> Options b v -> AnnDiagram b v m -> Result b v
+  fst $ D.renderDia C.Cairo (C.CairoOptions name (C.PNG (width, height))) (runImage image)
 
 --- Main runner
 
--- 'runImage' creates a "Graphics.Rendering.Diagrams" image from a "Graphics.Rendering.Diagrams.AST" image.
+{-
+  runImage :: (D.Renderable Diagrams.TwoD.Ellipse.Ellipse b, D.Renderable (P.Path D.R2) b, D.Backend b D.R2) =>
+  Image -> D.Diagram b D.R2
+-}
 runImage (Shape s)      = runShape s
 runImage (Modifier m i) = runModifier m (runImage i)
 runImage (Images c)     = runCombiner c
@@ -153,8 +163,8 @@ runCombiner (Layers     l) = mconcat . map runImage $ l
 runCombiner (Horizontal l) = D.hcat (map runImage l)
 runCombiner (Vertical   l) = D.vcat (map runImage l)
 
-runShape  Circle         = D.circle
-runShape  Square         = D.square
+runShape  Circle         = D.circle 1
+runShape  Square         = D.square 1
 runShape (Path Closed p) = P2.stroke $ P.close $ runPath p
 runShape (Path Open   p) = P2.stroke $ P.open  $ runPath p
 
@@ -163,7 +173,7 @@ runModifier (LineColor  c)  = D.lineColor c
 runModifier (LineWidth  w)  = D.lw w
 runModifier (Dashing  a w)  = D.dashing a w
 runModifier (Translate x y) = D.translate (x, y)
-runModifier (Rotate a)      = D.rotateBy (getAngleFraction a)
+runModifier (Rotate a)      = D.rotateBy (D.CircleFrac $ getAngleFraction a)
 runModifier (Scale x y)     = D.scaleX x . D.scaleY y
 runModifier (Pad r)         = D.pad r
 runModifier (Align a)       = runAlign a
@@ -173,7 +183,7 @@ runModifier  Freeze         = D.freeze
 
 runPath (Offsets l) = P.fromOffsets l
 runPath (Points  l) = (P.fromVertices . map P3.P) l
-runPath (Arc b   e) = A.arc (getAngleRadians b) (getAngleRadians e)
+runPath (Arc b   e) = A.arc b e
 
 runAlign L     = L.alignL
 runAlign R     = L.alignR
@@ -186,5 +196,5 @@ runAlign BR    = L.alignBR
 runAlign C     = L.centerXY
 runAlign CX    = L.centerX
 runAlign CY    = L.centerY
-runAlign (X x) = L.alignX $ toRational x
-runAlign (Y y) = L.alignY $ toRational y
+runAlign (X x) = L.alignX x
+runAlign (Y y) = L.alignY y

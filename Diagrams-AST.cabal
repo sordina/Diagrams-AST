@@ -59,9 +59,9 @@ Library
   Build-depends:
     pretty,
     vector-space,
-    diagrams-lib,
-    diagrams-core,
-    diagrams-cairo,
+    diagrams-lib >= 0.3,
+    diagrams-core >= 0.3,
+    diagrams-cairo >= 0.3,
     gloss,
     uniplate,
     base
