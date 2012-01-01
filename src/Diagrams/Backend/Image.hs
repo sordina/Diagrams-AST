@@ -45,7 +45,7 @@ data ImageBackend = ImageBackend
 instance HasLinearMap v => Backend ImageBackend v where
   data Render  ImageBackend v = SR AST.Image
   type Result  ImageBackend v = AST.Image
-  data Options ImageBackend v = SBOpt
+  data Options ImageBackend v = ImageOpts
 
   withStyle _ _ _      r = r -- XXX FIXME
   doRender  _ _ (SR r)   = r -- Ignore options for now

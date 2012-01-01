@@ -30,6 +30,7 @@ import qualified Diagrams.TwoD.Path                 as P2
 import qualified Diagrams.TwoD.Arc                  as A
 import qualified Diagrams.TwoD.Align                as L
 import qualified Diagrams.Backend.Cairo             as C
+import qualified Diagrams.TwoD.Text                 as T
 import qualified Graphics.Rendering.Diagrams.Points as P3
 
 import Diagrams.Prelude ((|||), (===))
@@ -69,7 +70,7 @@ data Images = Atop   Image Image
             | Horizontal [Image]
             | Vertical   [Image] deriving (Show, Eq, Ord, Data, Typeable)
 
-data Shape = Circle | Square | Path Fill Path deriving (Show, Eq, Ord, Data, Typeable)
+data Shape = Text String | Circle | Square | Path Fill Path deriving (Show, Eq, Ord, Data, Typeable)
 
 data Path = Offsets [(Double,Double)]
           | Points  [(Double,Double)]
@@ -163,6 +164,7 @@ runCombiner (Layers     l) = mconcat . map runImage $ l
 runCombiner (Horizontal l) = D.hcat (map runImage l)
 runCombiner (Vertical   l) = D.vcat (map runImage l)
 
+runShape  (Text s)       = T.text s
 runShape  Circle         = D.circle 1
 runShape  Square         = D.square 1
 runShape (Path Closed p) = P2.stroke $ P.close $ runPath p
